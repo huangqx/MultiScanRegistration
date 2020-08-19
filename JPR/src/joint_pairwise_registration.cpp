@@ -1,5 +1,6 @@
 #include "joint_pairwise_registration.h"
 #include "dynamic_linear_algebra.h"
+#include "linear_algebra.h"
 #include <algorithm>
 #include <set>
 using namespace std;
@@ -57,10 +58,10 @@ void JointPairwiseRegistration::Compute(const vector<PointCloud>& scans,
   const unsigned& num_reweighting_iters,
   const unsigned& num_gauss_newton_iters,
   const float& weight_point2planeDis,
-  vector<Affine3d>* opt_poses) {
-  Initialize_ANN(scans, weight_normal,weight_color);
+  vector<Affine3d>* opt_poses,
+  vector<PointCorres2> *pointcorres) {
+  Initialize_ANN(scans, weight_normal, weight_color);
   for (unsigned iter = 0; iter < num_reweighting_iters; ++iter) {
-    vector<PointCorres2> pointcorres;
     Compute_Correspondences(scans,
       *opt_poses, 
       max_distance,
@@ -68,9 +69,9 @@ void JointPairwiseRegistration::Compute(const vector<PointCloud>& scans,
       weight_normal,
       weight_color,
       down_sampling_rate,
-      &pointcorres);
-    Correspondence_Reweighting(&pointcorres);
-    Registration_With_KnownCorres(scans, pointcorres,
+      pointcorres);
+    Correspondence_Reweighting(pointcorres);
+    Registration_With_KnownCorres(scans, *pointcorres,
       num_gauss_newton_iters,
       weight_point2planeDis,
       opt_poses);
@@ -369,33 +370,11 @@ void JointPairwiseRegistration::Compute_Correspondences(
           ann_search->dists_,
           0.0);
         const Surfel3D& foot = (*fixed_pc.GetPointArray())[ann_search->nnIdx_[0]];
-        double sqrDis;
-        if (1) {
-          for (unsigned k = 0; k < 3; ++k)
+        //
+        for (unsigned k = 0; k < 3; ++k)
             pt_pos_transformed[k] -= foot.position[k];
-            sqrDis = pt_pos_transformed.getSqrNorm();
-        } else {
-          pt_pos_transformed = cur_pose_inv[0]
-            + cur_pose_inv[1] * foot.position[0]
-            + cur_pose_inv[2] * foot.position[1]
-            + cur_pose_inv[3] * foot.position[2];
-          pt_nor_transformed = cur_pose_inv[1] * foot.normal[0]
-            + cur_pose_inv[2] * foot.normal[1]
-            + cur_pose_inv[3] * foot.normal[2];
-          for (int k = 0; k < 3; ++k) {
-            ann_search_moving->queryPt_[k] = pt_pos_transformed[k];
-            ann_search_moving->queryPt_[k + 3] = weight_normal * pt_nor_transformed[k];
-            ann_search_moving->queryPt_[k + 6] = weight_color * foot.color[k];
-          }
-          ann_search_moving->kdTree_fixed_->annkSearch(
-            ann_search_moving->queryPt_,
-            1,
-            ann_search_moving->nnIdx_,
-            ann_search_moving->dists_,
-            0.0);
-          const Surfel3D& query2 = (*moving_pc.GetPointArray())[ann_search_moving->nnIdx_[0]];
-          sqrDis = (query.position - query2.position).getSqrNorm();
-        }
+        double sqrDis = pt_pos_transformed.getSqrNorm();
+        //
         if (sqrDis < max_distance * max_distance) {
           cand_corres[num_valid_corres].sourcePointId = indices[i];
           cand_corres[num_valid_corres].sourceSurfId = movingSurfId;
@@ -406,17 +385,6 @@ void JointPairwiseRegistration::Compute_Correspondences(
         }
       }
       if (num_valid_corres / double(indices.size()) > overlap_ratio) {
-        if (0) {
-          vector<float> temp;
-          temp.resize(cand_corres.size());
-          for (unsigned i = 0; i < cand_corres.size(); ++i)
-            temp[i] = cand_corres[i].weight;
-          sort(temp.begin(), temp.end());
-          float sigma2 = temp[static_cast<unsigned> (temp.size() * 0.5)];
-          for (unsigned i = 0; i < cand_corres.size(); ++i)
-            //    (*pointcorres)[i].weight = exp(-(*pointcorres)[i].weight / 2 / sigma2);
-            cand_corres[i].weight = sigma2 / (sigma2 + cand_corres[i].weight);
-        }
         for (unsigned i = 0; i < num_valid_corres; ++i) {
           (*pointcorres)[num_corres] = cand_corres[i];
           num_corres++;

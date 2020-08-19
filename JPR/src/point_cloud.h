@@ -1,7 +1,7 @@
 #ifndef point_cloud_h_
 #define point_cloud_h_
 
-#include "Surface.h"
+#include "surface.h"
 
 #include <vector>
 using	namespace	std;
@@ -49,6 +49,23 @@ public:
   int flags;
 };
 
+// The following struct stores point-wise correspondences between two point clouds
+struct PointCorres2 {
+ public:
+  PointCorres2() {
+    sourceSurfId = targetSurfId = 0;
+    sourcePointId = targetPointId = 0;
+    weight = 0.f;
+  }
+  ~PointCorres2() {
+  }
+  unsigned sourceSurfId;
+  unsigned targetSurfId;
+  unsigned sourcePointId;
+  unsigned targetPointId;
+  float weight;
+};
+
 class PointCloud: public Surface {
  public:
 	PointCloud(){
@@ -56,12 +73,6 @@ class PointCloud: public Surface {
   }
 	virtual ~PointCloud(){
   }
-  
-  /************************************************************************/
-	 /* Load and read from binary files
-	 /************************************************************************/
-  void Read(FILE *file_ptr);
-  void Write(FILE *file_ptr);
   
   // Bounding box
   void ComputeBoundingBox();
@@ -74,8 +85,6 @@ class PointCloud: public Surface {
     return &points_;
   }
  protected:
-  void ReadPoints(FILE *file_ptr);
-  void WritePoints(FILE *file_ptr);
   vector<Surfel3D> points_; //vertex array
 };
 

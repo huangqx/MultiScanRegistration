@@ -27,7 +27,7 @@
 #ifndef ANN_kd_tree_H
 #define ANN_kd_tree_H
 
-#include <ANNx.h>					// all ANN includes
+#include "ANNx.h"					// all ANN includes
 
 using namespace std;					// make std:: available
 

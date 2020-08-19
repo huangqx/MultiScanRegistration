@@ -34,7 +34,7 @@
 //	basic includes
 //----------------------------------------------------------------------
 
-#include <ANN.h>					// basic ANN includes
+#include "ANN.h"					// basic ANN includes
 
 //----------------------------------------------------------------------
 // kd-tree stats object

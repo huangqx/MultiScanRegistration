@@ -10,21 +10,6 @@
 #include <vector>
 using namespace std;
 
-struct PointCorres2 {
- public:
-  PointCorres2() {
-    sourceSurfId = targetSurfId = 0;
-    sourcePointId = targetPointId = 0;
-    weight = 0.f;
-  }
-  ~PointCorres2() {
-  }
-  unsigned sourceSurfId;
-  unsigned targetSurfId;
-  unsigned sourcePointId;
-  unsigned targetPointId;
-  float weight;
-};
 
 class ANNDataStructure {
  public:
@@ -66,7 +51,8 @@ class JointPairwiseRegistration {
     const unsigned &num_reweighting_iters,
     const unsigned &num_gauss_newton_iters, 
     const float &weight_point2planeDis,
-    vector<Affine3d> *opt_poses);
+    vector<Affine3d> *opt_poses,
+    vector<PointCorres2> *pointcorres);
  private:
   void Registration_With_KnownCorres(const vector<PointCloud>& scans,
     const vector<PointCorres2>& pointcorres,

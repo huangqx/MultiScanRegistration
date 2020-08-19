@@ -35,7 +35,7 @@
 #define ANNx_H
 
 #include <iomanip>				// I/O manipulators
-#include <ANN.h>			// ANN includes
+#include "ANN.h"			// ANN includes
 
 
 //----------------------------------------------------------------------

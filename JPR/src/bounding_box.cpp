@@ -1,4 +1,5 @@
 #include "bounding_box.h"
+#include "linear_algebra.h"
 //#include "stdafx.h"
 
 BoundingBox::BoundingBox() {
@@ -11,20 +12,6 @@ BoundingBox::BoundingBox() {
 }
 
 BoundingBox::~BoundingBox() {
-}
-
-void BoundingBox::Read(FILE *file_ptr) {
-  fread(&lower_corner[0], sizeof(Vector3d), 1, file_ptr);
-  fread(&upper_corner[0], sizeof(Vector3d), 1, file_ptr);
-  fread(&size[0], sizeof(Vector3d), 1, file_ptr);
-  fread(&center_point[0], sizeof(Vector3d), 1, file_ptr);
-}
-
-void BoundingBox::Write(FILE *file_ptr) {
-  fwrite(&lower_corner[0], sizeof(Vector3d), 1, file_ptr);
-  fwrite(&upper_corner[0], sizeof(Vector3d), 1, file_ptr);
-  fwrite(&size[0], sizeof(Vector3d), 1, file_ptr);
-  fwrite(&center_point[0], sizeof(Vector3d), 1, file_ptr);
 }
 
 void BoundingBox::Insert_A_Box(BoundingBox* newbox) {

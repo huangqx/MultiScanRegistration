@@ -17,8 +17,6 @@ struct BoundingBox {
 	/* IO Operations
 	*/
 	/************************************************************************/
-	void Read(FILE *file_ptr);
-	void Write(FILE *file_ptr);
 
 	// Update the size of the bounding box 
   // when adding a new bounding box

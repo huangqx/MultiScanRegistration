@@ -1,4 +1,5 @@
 #include "surface.h"
+#include "linear_algebra.h"
 
 Surface::Surface() {
   flags_	= 0;

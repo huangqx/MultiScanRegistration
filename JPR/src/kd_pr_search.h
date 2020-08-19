@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
-// File:			kd_search.h
+// File:			kd_pr_search.h
 // Programmer:		Sunil Arya and David Mount
-// Description:		Standard kd-tree search
+// Description:		Priority kd-tree search
 // Last modified:	01/04/05 (Version 1.0)
 //----------------------------------------------------------------------
 // Copyright (c) 1997-2005 University of Maryland and Sunil Arya and
@@ -22,27 +22,28 @@
 //		Initial release
 //----------------------------------------------------------------------
 
-#ifndef ANN_kd_search_H
-#define ANN_kd_search_H
+#ifndef ANN_kd_pr_search_H
+#define ANN_kd_pr_search_H
 
 #include "kd_tree.h"					// kd-tree declarations
 #include "kd_util.h"					// kd-tree utilities
+#include "pr_queue.h"					// priority queue declarations
 #include "pr_queue_k.h"					// k-element priority queue
 
 #include "ANNperf.h"				// performance evaluation
 
 //----------------------------------------------------------------------
-//	More global variables
-//		These are active for the life of each call to annkSearch(). They
-//		are set to save the number of variables that need to be passed
-//		among the various search procedures.
+//	Global variables
+//		Active for the life of each call to Appx_Near_Neigh() or
+//		Appx_k_Near_Neigh().
 //----------------------------------------------------------------------
 
-extern int				ANNkdDim;		// dimension of space (static copy)
-extern ANNpoint			ANNkdQ;			// query point (static copy)
-extern double			ANNkdMaxErr;	// max tolerable squared error
-extern ANNpointArray	ANNkdPts;		// the points (static copy)
-extern ANNmin_k			*ANNkdPointMK;	// set of k closest points
-extern int				ANNptsVisited;	// number of points visited
+extern double			ANNprEps;		// the error bound
+extern int				ANNprDim;		// dimension of space
+extern ANNpoint			ANNprQ;			// query point
+extern double			ANNprMaxErr;	// max tolerable squared error
+extern ANNpointArray	ANNprPts;		// the points
+extern ANNpr_queue		*ANNprBoxPQ;	// priority queue for boxes
+extern ANNmin_k			*ANNprPointMK;	// set of k closest points
 
 #endif

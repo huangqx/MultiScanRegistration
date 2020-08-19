@@ -1,1 +1,1 @@
-Please use the following command to compile the c++ code
+mex jpr_interface.cpp affine_transformation.cpp linear_algebra.cpp point_cloud.cpp bounding_box.cpp surface.cpp dynamic_linear_algebra.cpp joint_pairwise_registration.cpp ANN.cpp kd_tree.cpp kd_split.cpp kd_util.cpp kd_search.cpp kd_pr_search.cpp kd_fix_rad_search.cpp bd_tree.cpp bd_search.cpp bd_pr_search.cpp bd_fix_rad_search.cpp

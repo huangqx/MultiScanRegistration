@@ -24,7 +24,7 @@
 
 #include "kd_util.h"					// kd-utility declarations
 
-#include <ANN/ANNperf.h>				// performance evaluation
+#include "ANNperf.h"				// performance evaluation
 
 //----------------------------------------------------------------------
 // The following routines are utility functions for manipulating
