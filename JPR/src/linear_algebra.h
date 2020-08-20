@@ -1330,7 +1330,7 @@ inline unsigned searchPivot(const StaticMatrix<FloatType, size, size>& mat, unsi
     }
   }
   if (max <= pivotEps) {
-    if (success != NULL) {
+    if (success != nullptr) {
       *success = false;
       return 0;
     }
@@ -1339,7 +1339,7 @@ inline unsigned searchPivot(const StaticMatrix<FloatType, size, size>& mat, unsi
     }
   }
   else {
-    if (success != NULL) {
+    if (success != nullptr) {
       *success = true;
     }
     return result;
@@ -1352,7 +1352,7 @@ inline StaticMatrix<FloatType, size, size> invertMatrix(const StaticMatrix<Float
   StaticMatrix<FloatType, size, size> mCopy = mat;
   for (unsigned step = 0; step < size; step++) {
     unsigned pivot = searchPivot(mCopy, step, success, pivotEps);
-    if (success != NULL) {
+    if (success != nullptr) {
       if (!(*success)) {
         return result;
       }
@@ -1379,7 +1379,7 @@ inline StaticMatrix<FloatType, size, size> invertMatrix(const StaticMatrix<Float
       result.combineRows(row, step, m);
     }
   }
-  if (success != NULL) {
+  if (success != nullptr) {
     *success = true;
   }
   return result;

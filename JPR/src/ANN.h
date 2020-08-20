@@ -790,9 +790,9 @@ public:
 		ANNbool			with_pts,		// print points as well?
 		std::ostream&	out);			// output stream
 
-	virtual void Dump(					// dump entire tree
-		ANNbool			with_pts,		// print points as well?
-		std::ostream&	out);			// output stream
+	//virtual void Dump(					// dump entire tree
+	//	ANNbool			with_pts,		// print points as well?
+	//	std::ostream&	out);			// output stream
 								
 	virtual void getStats(				// compute tree statistics
 		ANNkdStats&		st);			// the statistics (modified)

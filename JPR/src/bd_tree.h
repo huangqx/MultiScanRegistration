@@ -90,7 +90,7 @@ public:
 				ANNkdStats &st,					// statistics
 				ANNorthRect &bnd_box);			// bounding box
 	virtual void print(int level, ostream &out);// print node
-	virtual void dump(ostream &out);			// dump node
+	//virtual void dump(ostream &out);			// dump node
 
 	virtual void ann_search(ANNdist);			// standard search
 	virtual void ann_pri_search(ANNdist);		// priority search
