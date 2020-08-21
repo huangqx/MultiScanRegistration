@@ -31,7 +31,7 @@ void ANNDataStructure::ClearANN() {
 void ANNDataStructure::InitializeANN(const PointCloud& pc,
   const double& weightNormal,
   const double& weightColor) {
-  dataPts_fixed_ = annAllocPts(static_cast<int> (pc.GetPointArray()->size()), 6);
+  dataPts_fixed_ = annAllocPts(static_cast<int> (pc.GetPointArray()->size()), 9);
   for (unsigned v_id = 0; v_id < pc.GetPointArray()->size();
     ++v_id) {
     const Surfel3D& point = (*pc.GetPointArray())[v_id];
@@ -42,14 +42,14 @@ void ANNDataStructure::InitializeANN(const PointCloud& pc,
     }
   }
   kdTree_fixed_ = new ANNkd_tree(dataPts_fixed_,
-    static_cast<int> (pc.GetPointArray()->size()), 6);
+    static_cast<int> (pc.GetPointArray()->size()), 9);
 
   queryPt_ = annAllocPt(9);
   nnIdx_ = new ANNidx[1];
   dists_ = new ANNdist[1];
 }
 
-void JointPairwiseRegistration::Compute(const vector<PointCloud>& scans,
+bool JointPairwiseRegistration::Compute(const vector<PointCloud>& scans,
   const float& max_distance,
   const float& overlap_ratio,
   const float& weight_normal,
@@ -61,6 +61,8 @@ void JointPairwiseRegistration::Compute(const vector<PointCloud>& scans,
   vector<Affine3d>* opt_poses,
   vector<PointCorres2> *pointcorres) {
   Initialize_ANN(scans, weight_normal, weight_color);
+  opt_poses->resize(scans.size());
+  bool flag = false;
   for (unsigned iter = 0; iter < num_reweighting_iters; ++iter) {
     Compute_Correspondences(scans,
       *opt_poses, 
@@ -71,14 +73,15 @@ void JointPairwiseRegistration::Compute(const vector<PointCloud>& scans,
       down_sampling_rate,
       pointcorres);
     Correspondence_Reweighting(pointcorres);
-    Registration_With_KnownCorres(scans, *pointcorres,
+    flag = Registration_With_KnownCorres(scans, *pointcorres,
       num_gauss_newton_iters,
       weight_point2planeDis,
       opt_poses);
   }
+  return flag;
 }
  
-void JointPairwiseRegistration::Registration_With_KnownCorres(
+bool JointPairwiseRegistration::Registration_With_KnownCorres(
   const vector<PointCloud>& scans,
   const vector<PointCorres2>& pointcorres,
   const unsigned& num_gauss_newton_iters,
@@ -110,6 +113,7 @@ void JointPairwiseRegistration::Registration_With_KnownCorres(
 
   double w1 = weight_point2planeDis, w2 = 1.0 - weight_point2planeDis;
 
+  bool search_success = false;
   for (unsigned iter = 0; iter < num_gauss_newton_iters; ++iter) {
     matA_full.SetZero();
     vecb_full.SetZero();
@@ -201,7 +205,6 @@ void JointPairwiseRegistration::Registration_With_KnownCorres(
     normOfA = normOfA * 1e-3;
 
     SolveNxN(matA, vecb, &vecx);
-    bool search_success = false;
     for (unsigned searchIter = 0; searchIter < 10; searchIter++) {
       vector<Affine3d> cand_poses = *opt_poses;
       for (unsigned id = 1; id < numscans; ++id) {
@@ -227,6 +230,7 @@ void JointPairwiseRegistration::Registration_With_KnownCorres(
       }
     }
   }
+  return search_success;
 }
 
 double JointPairwiseRegistration::RegistrationObjectiveValue(
@@ -360,7 +364,7 @@ void JointPairwiseRegistration::Compute_Correspondences(
 
         for (int k = 0; k < 3; ++k) {
           ann_search->queryPt_[k] = pt_pos_transformed[k];
-          ann_search->queryPt_[k + 3] = weight_normal*pt_nor_transformed[k];
+          ann_search->queryPt_[k+3] = weight_normal*pt_nor_transformed[k];
           ann_search->queryPt_[k+6] = weight_color*query.color[k];
         }
         ann_search->kdTree_fixed_->annkSearch(
@@ -369,7 +373,8 @@ void JointPairwiseRegistration::Compute_Correspondences(
           ann_search->nnIdx_,
           ann_search->dists_,
           0.0);
-        const Surfel3D& foot = (*fixed_pc.GetPointArray())[ann_search->nnIdx_[0]];
+        const Surfel3D& foot = 
+                (*fixed_pc.GetPointArray())[ann_search->nnIdx_[0]];
         //
         for (unsigned k = 0; k < 3; ++k)
             pt_pos_transformed[k] -= foot.position[k];

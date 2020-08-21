@@ -42,7 +42,7 @@ class JointPairwiseRegistration {
   }
   ~JointPairwiseRegistration() {
   }
-  void Compute(const vector<PointCloud> &scans,
+  bool Compute(const vector<PointCloud> &scans,
     const float& max_distance,
     const float &overlap_ratio,
     const float &weight_normal,
@@ -54,7 +54,7 @@ class JointPairwiseRegistration {
     vector<Affine3d> *opt_poses,
     vector<PointCorres2> *pointcorres);
  private:
-  void Registration_With_KnownCorres(const vector<PointCloud>& scans,
+  bool Registration_With_KnownCorres(const vector<PointCloud>& scans,
     const vector<PointCorres2>& pointcorres,
     const unsigned& num_gauss_newton_iters,
     const float& weight_point2planeDis,

@@ -49,8 +49,8 @@ void mexFunction(
           Surfel3D *sur = &(*surfels)[i-left];
           int off = 9*i;
           for (int k = 0; k < 3; ++k) {
-              sur->position[k] = pointData[off+k];
-              sur->normal[k] = pointData[off+3+k];
+              sur->position[k] = static_cast<float> (pointData[off+k]);
+              sur->normal[k] = static_cast<float> (pointData[off+3+k]);
               sur->color[k] = 0.f;
           }
       }
@@ -73,7 +73,7 @@ void mexFunction(
   
 // Perform multi-scan registration
   JointPairwiseRegistration jpr;
-  jpr.Compute(scans,
+  bool flag = jpr.Compute(scans,
           max_distance, overlap_ratio,
           weight_normal, weight_color,
           down_sampling_rate, num_reweighting_iters, num_gauss_newton_iters,
@@ -84,12 +84,14 @@ void mexFunction(
   // Output optimized scan poses
   output[0] = mxCreateDoubleMatrix(12, numScans, mxREAL);
   data = mxGetPr(output[0]);
-  for (unsigned scanid = 0; scanid < numScans; ++scanid) {
+  if (flag) {
+    for (unsigned scanid = 0; scanid < numScans; ++scanid) {
 	  for (int i = 0; i < 4; ++i) {
           for (int j = 0; j < 3; ++j) {
               data[12*scanid+i*3+j] = opt_poses[scanid][i][j];
           }
       }
+    }
   }
   
   // Output optimized correspondences
