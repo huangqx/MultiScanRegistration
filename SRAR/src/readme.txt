@@ -1,1 +1,1 @@
-Please use the following command line to compile the c++ code
+mex srar_interface.cpp affine_transformation.cpp bounding_box.cpp dynamic_linear_algebra.cpp linear_algebra.cpp octree.cpp pairwise_rigid_alignment.cpp point_cloud.cpp simul_reg_and_recons.cpp surface.cpp
