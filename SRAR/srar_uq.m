@@ -8,6 +8,8 @@ function [CovM] = srar_uq(scans, poses_opt, LatentSurf, Para)
 %       'LatentSurf': a datastructure that encodes the latent surface and
 %                     optimized correspondences between the input scans 
 %                     and the latent surface
+%       'Para.uq_numEigens': Number of leading eigenvectors we extract from
+%                         the predicted covariance matrix
 % Output parameters:
 %        'CovM': A convariance matrix data structure that encodes 
 %                the predicted covariance matrix. Note that for large-scale
@@ -26,30 +28,25 @@ function [CovM] = srar_uq(scans, poses_opt, LatentSurf, Para)
 
 % Step 1: Pre-compute all the relevant points and store them in a data
 % array
-numpoints_total = 0;
-for scan_id = 1 : length(scans)
-    numpoints_total = numpoints_total + size(LatentSurf.corres{scan_id},2);
-end
+numpoints_total = size(LatentSurf.corres, 2);
 datapoints_opt = zeros(3, numpoints_total); % global variable
-scanindices = zeros(1, numpoints_total); % global variable
-surfelindices = zeros(1, numpoints_total); %global variable
+scanindices = LatentSurf.corres(1,:); % global variable
+surfelindices = LatentSurf.corres(3,:); %global variable
 %
-off = 0;
+ids = 1:(numpoints_total-1);
+offsets = find(LatentSurf.corres(1, ids)~=LatentSurf.corres(1, ids+1));
+offsets = [0, offsets, numpoints_total];
+%
 for scan_id = 1 : length(scans)
-    R = poses_opt{scan_id}(:,1:3);
-    t = poses_opt{scan_id}(:,4);
-    corres = LatentSurf.corres{scan_id};
-    num_samples = size(corres, 2);
-    %
-    scanindices((off+1):(off+num_samples)) = scan_id;
-    surfelindices((off+1):(off+num_samples)) = corres(2,:);
+    t = poses_opt(1:3, scan_id);
+    R = reshape(poses_opt(4:12, scan_id), [3,3]);
+    left = offsets(scan_id)+1;
+    right = offsets(scan_id+1);
+    pointids = LatentSurf.corres(2, left:right);
+    pointPoss = scans{scan_id}.points(1:3, pointids);
     % Transform the points
-    pointPoss = scans{scan_id}(1:3, corres(1,:));
-    datapoints_opt(:, (off+1):(off+num_samples)) =...
-        R*pointPoss + t*ones(1, num_samples);
-    
-    %
-    off = off + num_samples;
+    datapoints_opt(:, left:right) =...
+        R*pointPoss + t*ones(1, right-left+1);
 end
 
 % Step 2: predict the sample variance
@@ -70,7 +67,7 @@ J_cols(7:9, :) = 6*num_scans + (3*ones(3,1)*surfelindices...
     + (-2:0)'*ones(1, numpoints_total));
 
 % Buffer the values of the elements
-J_vals = ones(9, numpoints_total);
+J_vals = -ones(9, numpoints_total);
 J_vals(1:3, :) = footNors;
 J_vals(4, :) = datapoints_opt(2,:).*footNors(3,:)...
     - datapoints_opt(3,:).*footNors(2,:);
@@ -110,20 +107,20 @@ for id = 2:num_scans
 end
 
 % Extract the leading eigen-vectors 
-[eigenVecs, eigenVals] = eig(Cov_inv);
-[s,order] = sort(diag(eigenVals));
-ids = order((length(order)-Para.numEigens+1):length(order));
-CovM.eigenVecs = eigenVecs(:, ids);
+[eigenVecs, eigenVals] = eig(full(Cov_inv));
+[s,order] = sort(-diag(eigenVals));
+ids = order((length(order)-Para.uq_numEigens+1):length(order));
+CovM.eigenVecs = [zeros(6, Para.uq_numEigens);eigenVecs(:, ids)];
 CovM.eigenVals = sqrt(diag(eigenVals(ids,ids)));
 
 function [footTansI, footTansII] = coordinateFrame(footNors)
 % Complete the coordinate frame 
 num_surfels = size(footNors, 2);
 footTansI = ones(3, num_surfels);
-[s,ids] = max(abs(fotNors));
+[s,ids] = max(abs(footNors));
 footTansI((0:3:(3*num_surfels-3))+ids) = 0;
 inner = sum(footTansI.*footNors);
 footTansI = footTansI - (ones(3,1)*inner).*footNors;
-norms = sqrt(sum(footTansI.*footTansI);
+norms = sqrt(sum(footTansI.*footTansI));
 footTansI = footTansI./(ones(3,1)*norms);
 footTansII = cross(footNors, footTansI);
