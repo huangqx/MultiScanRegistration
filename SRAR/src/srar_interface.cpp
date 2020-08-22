@@ -136,9 +136,9 @@ void mexFunction(
   unsigned off = 0;
   for (unsigned scanid = 0; scanid < corres.size(); ++scanid) {
       for (unsigned j = 0; j < corres[scanid].size(); ++j) {
-          data[4*off] = scanid;
-          data[4*off+1] = corres[scanid][j].sourcePointId;
-          data[4*off+2] = corres[scanid][j].targetPointId;
+          data[4*off] = scanid + 1;
+          data[4*off+1] = corres[scanid][j].sourcePointId + 1;
+          data[4*off+2] = corres[scanid][j].targetPointId + 1;
           data[4*off+3] = corres[scanid][j].weight;
           off++;
       }
