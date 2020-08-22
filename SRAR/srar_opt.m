@@ -27,3 +27,26 @@ function [poses_opt, LatentSurf] = srar_opt(scans, Para)
 %       'LatentSurf': a datastructure that encodes the latent surface and
 %                     optimized correspondences between the input scans 
 %                     and the latent surface
+paras = [Para.srar_stride, Para.srar_weightPoint2PlaneDis,...
+    Para.srar_minNumPointsPerCell, Para.srar_maxNumPointsPerCell,...
+    Para.srar_numAlternatingIterations, Para.srar_gridSize_coarse,...
+    Para.srar_gridSize_fine, Para.srar_num_levels];
+                  
+numscans = length(scans);
+numpoints = 0;
+point_offsets = zeros(1, numscans+1);
+for id = 1 : numscans
+    numpoints_new = size(scans{id}.points, 2);
+    numpoints = numpoints + numpoints_new;
+    point_offsets(id+1) = numpoints;
+end
+points_all = zeros(9, numpoints);
+numpoints = 0;
+for id = 1 : numscans
+    numpoints_new = size(scans{id}.points, 2);
+    points_all(:, (numpoints+1):(numpoints+numpoints_new)) = scans{id}.points;
+    numpoints = numpoints + numpoints_new;   
+end
+%
+[poses_opt, LatentSurf.surfels, LatentSurf.corres] = srar_interface(...
+    points_all, point_offsets, paras);
