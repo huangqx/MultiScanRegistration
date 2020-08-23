@@ -63,7 +63,7 @@ One of the fundamental chanllenges of multi-scan registration is to assess the r
 1) The input noise model can be directed estimated from the aligned scans.
 2) We introduced a closed-form approximation of the output covariance matrix. The approximation only requires one set of aligned scans.
 
-
+![Illustration of Predicted Covariance Matrices](UQ_Illus.jpg)
 
 
 For joint pairwise registration, the procedure is the following:
