@@ -26,7 +26,7 @@ where $d$ measures the distance between a pair of overlapping scans, note that t
 
 ![Illustration of Joint Pairwise Registration](JPR_Illus.jpg)
 
-Our implementation of this approach is included in folder 'JPR'
+Our implementation of this approach is included in folder 'JPR' (Please compile the c++ files first)
 
 <p>>> load('Jsample_data.mat');</p>
 <p>>> [poses_opt, NNStruct] = jpr_opt(scans, Para);</p>
@@ -47,7 +47,7 @@ In the <a href="https://www.cs.utexas.edu/~huangqx/icra10.pdf">ICRA10 paper</a>,
 
 ![Illustration of Simultaneous Registration and Reconstruction](SRAR_Illus.jpg)
 
-Our implementation of this approach is included in folder 'SRAR'
+Our implementation of this approach is included in folder 'SRAR' (Please compile the c++ files first)
 
 <p>>> load('sample_data.mat');</p>
 <p>>> [poses_opt, LatentSurf] = srar_opt(scans, Para);</p>
