@@ -15,7 +15,16 @@ A multi-scan registration technique typically solves an optimization problem. Th
 
 # Joint Pairwise Registration
 
-Joint pairwise registration seeks to minimize the distances between pairs of overlapping scans by jointly transforming all the input scans. This formulation is an extension of pair registration. It also connects to bundle adjustment for multi-view registration. The difference is that for scan registration, the correspondences between scans are dynamically updated according to closest points. 
+Joint pairwise registration seeks to minimize the distances between pairs of overlapping scans by jointly transforming all the input scans. This formulation is an extension of pair registration. It also connects to bundle adjustment for multi-view registration. The difference is that for scan registration, the correspondences between scans are dynamically updated according to closest points. Formally speaking, joint pairwise registration amounts to solve the following optimization problem:
+
+![Formulation of Joint Pairwise Registration](JPR.jpg)
+
+where $d$ measures the distance between a pair of overlapping scans. Note that this distance typicallys requires to model partial similarities between scan pairs. This is typically down by using reweighted correspondences between points. Since the objective function consists of non-linear least squares, we solve joint pairwise registration using the Gauss-Newton method. The procedure alternates among the following three steps:
+1) Compute nearest neighbors of sample points between each pair of scans to form initial correspondences.
+2) Reweight the correspondences based on their distances.
+3) Minimize the weighted sum of distances using the Gauss-Newton method. The figure below shows an example.
+
+![Illustration of Joint Pairwise Registration](JPR_Illus.jpg)
 
 # Simultaneous Registration and Reconstruction
 
