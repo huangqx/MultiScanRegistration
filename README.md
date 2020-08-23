@@ -26,6 +26,15 @@ where $d$ measures the distance between a pair of overlapping scans. Note that t
 
 ![Illustration of Joint Pairwise Registration](JPR_Illus.jpg)
 
+Our implementation of this approach is included in folder 'JPR'
+
+<p>>> load('sample_data.mat');</p>
+<p>>> [poses_opt, NNStruct] = jpr_opt(scans, Para);</p>
+
+<p>'scans' collects the input scans. Each scan is a collection of surfels, where each surfel contains its position, normal, and color.</p>
+<p>'poses_opt' contains the optimized scan poses. Each column is a 12 dimensional vector that includes [t; reshape(R,[9,1])];</p>
+<p>'NNStruct' collects optimized correspondences between the aligned scans. </p>
+
 # Simultaneous Registration and Reconstruction
 
 # Uncertainty Quantification 
