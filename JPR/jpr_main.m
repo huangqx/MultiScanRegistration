@@ -26,7 +26,7 @@ function [poses_opt, CovM] = jpr_main(scans, Para)
 [poses_opt, NNStruct] = jpr_opt(scans, Para);
 
 % Step 2: Extract the predicted convariance matrix
-CovM = jpr_uq(scans, poses_opt, NNStruct);
+CovM = jpr_uq(scans, poses_opt, NNStruct, Para);
 
 % Step 3: Extract point-wise variance
 for scanid = 1 : length(scans)
